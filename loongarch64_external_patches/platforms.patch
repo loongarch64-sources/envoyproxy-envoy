@@ -1,0 +1,28 @@
+diff --git a/cpu/BUILD b/cpu/BUILD
+index 729d711..bee7339 100644
+--- a/cpu/BUILD
++++ b/cpu/BUILD
+@@ -40,6 +40,11 @@ constraint_value(
+     constraint_setting = ":cpu",
+ )
+ 
++constraint_value(
++    name = "loongarch64",
++    constraint_setting = ":cpu",
++)
++
+ alias(
+     name = "arm",
+     actual = ":aarch32",
+@@ -80,6 +85,11 @@ alias(
+     actual = ":aarch64",
+ )
+ 
++alias(
++    name = "loong64",
++    actual = ":loongarch64",
++)
++
+ constraint_value(
+     name = "arm64_32",
+     constraint_setting = ":cpu",

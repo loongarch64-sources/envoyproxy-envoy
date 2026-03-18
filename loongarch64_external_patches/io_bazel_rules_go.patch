@@ -1,0 +1,69 @@
+diff --git a/go/private/platforms.bzl b/go/private/platforms.bzl
+index 4da4306..5db534c 100755
+--- a/go/private/platforms.bzl
++++ b/go/private/platforms.bzl
+@@ -30,6 +30,7 @@ BAZEL_GOARCH_CONSTRAINTS = {
+     "amd64": "@platforms//cpu:x86_64",
+     "arm": "@platforms//cpu:arm",
+     "arm64": "@platforms//cpu:aarch64",
++    "loong64": "@platforms//cpu:loongarch64",
+     "ppc64": "@platforms//cpu:ppc",
+     "ppc64le": "@platforms//cpu:ppc",
+     "s390x": "@platforms//cpu:s390x",
+@@ -58,6 +59,7 @@ GOOS_GOARCH = (
+     ("linux", "amd64"),
+     ("linux", "arm"),
+     ("linux", "arm64"),
++    ("linux", "loong64"),
+     ("linux", "mips"),
+     ("linux", "mips64"),
+     ("linux", "mips64le"),
+@@ -118,6 +120,7 @@ CGO_GOOS_GOARCH = {
+     ("linux", "amd64"): None,
+     ("linux", "arm"): None,
+     ("linux", "arm64"): None,
++    ("linux", "loong64"): None,
+     ("linux", "mips"): None,
+     ("linux", "mips64"): None,
+     ("linux", "mips64le"): None,
+diff --git a/go/private/sdk.bzl b/go/private/sdk.bzl
+index 5a3ef42..ac3324a 100755
+--- a/go/private/sdk.bzl
++++ b/go/private/sdk.bzl
+@@ -27,6 +27,7 @@ def _go_host_sdk_impl(ctx):
+     goroot = _detect_host_sdk(ctx)
+     platform = _detect_sdk_platform(ctx, goroot)
+     version = _detect_sdk_version(ctx, goroot)
++    print("DEBUG: version = %s" % version)
+     _sdk_build_file(ctx, platform, version, experiments = ctx.attr.experiments)
+     _local_sdk(ctx, goroot)
+ 
+@@ -440,12 +441,13 @@ def _sdk_build_file(ctx, platform, version, experiments):
+     goos, _, goarch = platform.partition("_")
+ 
+     pv = parse_version(version)
+-    if pv != None and pv[1] >= 20:
+-        # Turn off coverageredesign GOEXPERIMENT on 1.20+
+-        # until rules_go is updated to work with the
+-        # coverage redesign.
+-        if not "nocoverageredesign" in experiments and not "coverageredesign" in experiments:
+-            experiments = experiments + ["nocoverageredesign"]
++    # loong64 not support nocoverageredesign
++#    if pv != None and pv[1] >= 20:
++#        # Turn off coverageredesign GOEXPERIMENT on 1.20+
++#        # until rules_go is updated to work with the
++#        # coverage redesign.
++#        if not "nocoverageredesign" in experiments and not "coverageredesign" in experiments:
++#            experiments = experiments + ["nocoverageredesign"]
+ 
+     ctx.template(
+         "BUILD.bazel",
+@@ -478,6 +480,8 @@ def _detect_host_platform(ctx):
+         goarch = "arm64"
+     elif goarch == "x86_64":
+         goarch = "amd64"
++    elif goarch == "loongarch64":
++        goarch = "loong64"
+ 
+     return goos, goarch
+ 

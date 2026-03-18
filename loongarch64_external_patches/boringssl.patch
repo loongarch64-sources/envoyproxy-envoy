@@ -1,0 +1,14 @@
+diff --git a/src/include/openssl/target.h b/src/include/openssl/target.h
+index 1273641..a40e0e7 100644
+--- a/src/include/openssl/target.h
++++ b/src/include/openssl/target.h
+@@ -45,6 +45,9 @@
+ #define OPENSSL_RISCV64
+ #elif defined(__riscv) && __SIZEOF_POINTER__ == 4
+ #define OPENSSL_32_BIT
++#elif defined(__loongarch64) || defined(__loongarch64__)
++#define OPENSSL_64_BIT
++#define OPENSSL_LOONGARCH64
+ #elif defined(__pnacl__)
+ #define OPENSSL_32_BIT
+ #define OPENSSL_PNACL

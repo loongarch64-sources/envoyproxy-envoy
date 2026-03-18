@@ -1,0 +1,152 @@
+diff --git a/BUILD.bazel b/BUILD.bazel
+index 0df4f67..b633cdf 100644
+--- a/BUILD.bazel
++++ b/BUILD.bazel
+@@ -357,6 +357,10 @@ v8_config(
+                 "V8_TARGET_ARCH_PPC64",
+                 "V8_TARGET_ARCH_PPC_LE",
+             ],
++            "@v8//bazel/config:v8_target_loong64": [
++                # NOTE: Bazel rules for loong64 weren't tested on a real system.
++                "V8_TARGET_ARCH_LOONG64",
++            ],
+         },
+         no_match_error = "Please specify a target cpu supported by v8",
+     ) + select({
+@@ -2400,6 +2404,35 @@ filegroup(
+             "src/regexp/riscv64/regexp-macro-assembler-riscv64.h",
+             "src/wasm/baseline/riscv64/liftoff-assembler-riscv64.h",
+         ],
++        "@v8//bazel/config:v8_target_loong64": [
++            "src/baseline/loong64/baseline-assembler-loong64-inl.h",
++            "src/baseline/loong64/baseline-compiler-loong64-inl.h",
++            "src/codegen/loong64/assembler-loong64-inl.h",
++            "src/codegen/loong64/assembler-loong64.cc",
++            "src/codegen/loong64/assembler-loong64.h",
++            "src/codegen/loong64/constants-loong64.cc",
++            "src/codegen/loong64/constants-loong64.h",
++            "src/codegen/loong64/cpu-loong64.cc",
++            "src/codegen/loong64/interface-descriptors-loong64-inl.h",
++            "src/codegen/loong64/macro-assembler-loong64.cc",
++            "src/codegen/loong64/macro-assembler-loong64.h",
++            "src/codegen/loong64/register-loong64.h",
++            "src/codegen/loong64/reglist-loong64.h",
++            "src/compiler/backend/loong64/code-generator-loong64.cc",
++            "src/compiler/backend/loong64/instruction-codes-loong64.h",
++            "src/compiler/backend/loong64/instruction-scheduler-loong64.cc",
++            "src/compiler/backend/loong64/instruction-selector-loong64.cc",
++            "src/deoptimizer/loong64/deoptimizer-loong64.cc",
++            "src/diagnostics/loong64/disasm-loong64.cc",
++            "src/diagnostics/loong64/unwinder-loong64.cc",
++            "src/execution/loong64/frame-constants-loong64.cc",
++            "src/execution/loong64/frame-constants-loong64.h",
++            "src/execution/loong64/simulator-loong64.cc",
++            "src/execution/loong64/simulator-loong64.h",
++            "src/regexp/loong64/regexp-macro-assembler-loong64.cc",
++            "src/regexp/loong64/regexp-macro-assembler-loong64.h",
++            "src/wasm/baseline/loong64/liftoff-assembler-loong64.h",
++        ],
+         "@v8//bazel/config:v8_target_ppc64le": [
+             "src/baseline/ppc/baseline-assembler-ppc-inl.h",
+             "src/baseline/ppc/baseline-compiler-ppc-inl.h",
+@@ -3005,6 +3038,7 @@ filegroup(
+         "@v8//bazel/config:v8_target_arm64": ["src/builtins/arm64/builtins-arm64.cc"],
+         "@v8//bazel/config:v8_target_s390x": ["src/builtins/s390/builtins-s390.cc"],
+         "@v8//bazel/config:v8_target_riscv64": ["src/builtins/riscv64/builtins-riscv64.cc"],
++        "@v8//bazel/config:v8_target_loong64": ["src/builtins/loong64/builtins-loong64.cc"],
+         "@v8//bazel/config:v8_target_ppc64le": ["src/builtins/ppc/builtins-ppc.cc"],
+     }) + select({
+         ":is_v8_enable_webassembly": [
+@@ -3133,6 +3167,7 @@ filegroup(
+         "@v8//bazel/config:is_inline_asm_arm64": ["src/heap/base/asm/arm64/push_registers_asm.cc"],
+         "@v8//bazel/config:is_inline_asm_s390x": ["src/heap/base/asm/s390/push_registers_asm.cc"],
+         "@v8//bazel/config:is_inline_asm_riscv64": ["src/heap/base/asm/riscv64/push_registers_asm.cc"],
++        "@v8//bazel/config:is_inline_asm_loong64": ["src/heap/base/asm/loong64/push_registers_asm.cc"],
+         "@v8//bazel/config:is_inline_asm_ppc64le": ["src/heap/base/asm/ppc/push_registers_asm.cc"],
+         "@v8//bazel/config:is_msvc_asm_ia32": ["src/heap/base/asm/ia32/push_registers_masm.asm"],
+         "@v8//bazel/config:is_msvc_asm_x64": ["src/heap/base/asm/x64/push_registers_masm.asm"],
+diff --git a/bazel/config/BUILD.bazel b/bazel/config/BUILD.bazel
+index 448260d..15fa928 100644
+--- a/bazel/config/BUILD.bazel
++++ b/bazel/config/BUILD.bazel
+@@ -59,6 +59,11 @@ config_setting(
+     constraint_values = ["@platforms//cpu:riscv64"],
+ )
+ 
++config_setting(
++    name = "platform_cpu_loong64",
++    constraint_values = ["@platforms//cpu:loongarch64"],
++)
++
+ config_setting(
+     name = "platform_cpu_ppc64le",
+     constraint_values = ["@platforms//cpu:ppc"],
+@@ -106,6 +111,11 @@ v8_configure_target_cpu(
+     matching_configs = [":platform_cpu_riscv64"],
+ )
+ 
++v8_configure_target_cpu(
++    name = "loong64",
++    matching_configs = [":platform_cpu_loong64"],
++)
++
+ v8_configure_target_cpu(
+     name = "ppc64le",
+     matching_configs = [":platform_cpu_ppc64le"],
+@@ -157,6 +167,7 @@ selects.config_setting_group(
+         ":is_s390x",
+         ":is_riscv64",
+         ":is_ppc64le",
++        ":is_loong64",
+     ],
+ )
+ 
+@@ -258,6 +269,14 @@ selects.config_setting_group(
+     ],
+ )
+ 
++selects.config_setting_group(
++    name = "is_inline_asm_loong64",
++    match_all = [
++        ":is_posix",
++        ":is_loong64",
++    ],
++)
++
+ selects.config_setting_group(
+     name = "is_inline_asm_ppc64le",
+     match_all = [
+diff --git a/bazel/config/v8-target-cpu.bzl b/bazel/config/v8-target-cpu.bzl
+index a0ce9d1..f9bfea7 100644
+--- a/bazel/config/v8-target-cpu.bzl
++++ b/bazel/config/v8-target-cpu.bzl
+@@ -14,7 +14,7 @@ V8CpuTypeInfo = provider(
+ )
+ 
+ def _host_target_cpu_impl(ctx):
+-    allowed_values = ["arm", "arm64", "ia32", "ppc64le", "riscv64", "s390x", "x64", "none"]
++    allowed_values = ["arm", "arm64", "ia32", "ppc64le", "riscv64", "loong64", "s390x", "x64", "none"]
+     cpu_type = ctx.build_setting_value
+     if cpu_type in allowed_values:
+         return V8CpuTypeInfo(value = cpu_type)
+diff --git a/bazel/defs.bzl b/bazel/defs.bzl
+index 0327669..7fdb9e4 100644
+--- a/bazel/defs.bzl
++++ b/bazel/defs.bzl
+@@ -126,6 +126,8 @@ def _default_args():
+                 "-Wno-comments",
+                 "-Wno-deprecated-declarations",
+                 "-Wno-implicit-fallthrough",
++                "-Wno-template-id-cdtor",
++                "-Wno-dangling-pointer",
+                 "-Wno-int-in-bool-context",
+                 "-Wno-maybe-uninitialized",
+                 "-Wno-mismatched-new-delete",
+@@ -407,6 +409,7 @@ def _v8_target_cpu_transition_impl(settings, attr):
+         "x64_windows": "x64",
+         "x86": "ia32",
+         "aarch64": "arm64",
++        "loongarch64": "loong64",
+         "arm64-v8a": "arm64",
+         "arm": "arm64",
+         "darwin_arm64": "arm64",

@@ -1,0 +1,32 @@
+diff --git a/foreign_cc/repositories.bzl b/foreign_cc/repositories.bzl
+index e2385c6..b41b700 100644
+--- a/foreign_cc/repositories.bzl
++++ b/foreign_cc/repositories.bzl
+@@ -8,16 +8,16 @@ load("//toolchains:toolchains.bzl", "built_toolchains", "prebuilt_toolchains", "
+ # buildifier: disable=unnamed-macro
+ def rules_foreign_cc_dependencies(
+         native_tools_toolchains = [],
+-        register_default_tools = True,
++        register_default_tools = False,
+         cmake_version = "3.23.2",
+         make_version = "4.4",
+         ninja_version = "1.11.1",
+         meson_version = "1.1.1",
+         pkgconfig_version = "0.29.2",
+         register_preinstalled_tools = True,
+-        register_built_tools = True,
++        register_built_tools = False,
+         register_toolchains = True,
+-        register_built_pkgconfig_toolchain = True):
++        register_built_pkgconfig_toolchain = False):
+     """Call this function from the WORKSPACE file to initialize rules_foreign_cc \
+     dependencies and let neccesary code generation happen \
+     (Code generation is needed to support different variants of the C++ Starlark API.).
+@@ -63,6 +63,7 @@ def rules_foreign_cc_dependencies(
+ 
+     register_framework_toolchains(register_toolchains = register_toolchains)
+ 
++    print("register_default_tools=", register_default_tools, "register_built_tools=", register_built_tools, "register_preinstalled_tools=", register_preinstalled_tools)
+     if register_toolchains:
+         native.register_toolchains(*native_tools_toolchains)
+ 

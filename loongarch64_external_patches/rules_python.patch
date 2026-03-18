@@ -1,0 +1,68 @@
+diff --git a/python/repositories.bzl b/python/repositories.bzl
+index aab68eb..b1af7c6 100644
+--- a/python/repositories.bzl
++++ b/python/repositories.bzl
+@@ -553,7 +553,9 @@ def python_register_toolchains(
+             register_coverage_tool = False
+ 
+     loaded_platforms = []
++    print("DEBUG: PYTHON_VERSION is %s" % python_version)
+     for platform in PLATFORMS.keys():
++        print("DEBUG: platform is %s" % platform)
+         sha256 = tool_versions[python_version]["sha256"].get(platform, None)
+         if not sha256:
+             continue
+diff --git a/python/versions.bzl b/python/versions.bzl
+index 9a28f15..526ea1a 100644
+--- a/python/versions.bzl
++++ b/python/versions.bzl
+@@ -20,7 +20,7 @@ MACOS_NAME = "mac os"
+ LINUX_NAME = "linux"
+ WINDOWS_NAME = "windows"
+ 
+-DEFAULT_RELEASE_BASE_URL = "https://github.com/indygreg/python-build-standalone/releases/download"
++DEFAULT_RELEASE_BASE_URL = "https://github.com/Loongson-Cloud-Community/python-build-standalone/releases/download"
+ 
+ # When updating the versions and releases, run the following command to get
+ # the hashes:
+@@ -369,6 +369,13 @@ TOOL_VERSIONS = {
+         },
+         "strip_prefix": "python",
+     },
++    "3.11.11": {
++        "url": "20241205/cpython-{python_version}+20241205-{platform}-{build}.tar.gz",
++        "sha256": {
++            "loongarch64-unknown-linux-gnu": "3f1f273faa30f86314c83e48558ef6004354d006a4c582bb050b09868a2eee13",
++        },
++        "strip_prefix": "python",
++    },
+     "3.12.0": {
+         "url": "20231002/cpython-{python_version}+20231002-{platform}-{build}.tar.gz",
+         "sha256": {
+@@ -402,7 +409,7 @@ MINOR_MAPPING = {
+     "3.8": "3.8.18",
+     "3.9": "3.9.18",
+     "3.10": "3.10.13",
+-    "3.11": "3.11.7",
++    "3.11": "3.11.11",
+     "3.12": "3.12.1",
+ }
+ 
+@@ -428,6 +435,17 @@ PLATFORMS = {
+         # repository_ctx.execute(["uname", "-m"]).stdout.strip()
+         arch = "aarch64",
+     ),
++    "loongarch64-unknown-linux-gnu": struct(
++        compatible_with = [
++            "@platforms//os:linux",
++            "@platforms//cpu:loongarch64",
++        ],
++        os_name = LINUX_NAME,
++        # Note: this string differs between OSX and Linux
++        # Matches the value returned from:
++        # repository_ctx.execute(["uname", "-m"]).stdout.strip()
++        arch = "loongarch64",
++    ),
+     "ppc64le-unknown-linux-gnu": struct(
+         compatible_with = [
+             "@platforms//os:linux",
