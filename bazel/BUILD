@@ -630,6 +630,11 @@ config_setting(
 )
 
 config_setting(
+    name = "linux_loongarch64",
+    values = {"cpu": "loongarch64"},
+)
+
+config_setting(
     name = "windows_x86_64",
     values = {"cpu": "x64_windows"},
 )
@@ -804,6 +809,7 @@ selects.config_setting_group(
     name = "linux",
     match_any = [
         ":linux_aarch64",
+        ":linux_loongarch64",
         ":linux_mips64",
         ":linux_ppc",
         ":linux_s390x",
@@ -832,6 +838,7 @@ selects.config_setting_group(
         ":ios_i386",
         ":ios_sim_arm64",
         ":linux_aarch64",
+        ":linux_loongarch64",
         ":linux_mips64",
         ":linux_ppc",
         ":linux_s390x",

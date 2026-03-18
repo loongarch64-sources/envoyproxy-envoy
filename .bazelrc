@@ -17,8 +17,9 @@ build --color=yes
 build --jobs=HOST_CPUS-1
 build --workspace_status_command="bash bazel/get_workspace_status"
 build --incompatible_strict_action_env
-build --java_runtime_version=remotejdk_11
-build --tool_java_runtime_version=remotejdk_11
+build --java_runtime_version=local_jdk
+build --tool_java_runtime_version=local_jdk
+build --extra_toolchains=@local_jdk//:all
 build --platform_mappings=bazel/platform_mappings
 # silence absl logspam.
 build --copt=-DABSL_MIN_LOG_LEVEL=4
@@ -28,6 +29,8 @@ build --enable_platform_specific_config
 
 # Pass CC, CXX and LLVM_CONFIG variables from the environment.
 # We assume they have stable values, so this won't cause action cache misses.
+# build --action_env=CC=clang --host_action_env=CC=clang
+# build --action_env=CXX=clang++ --host_action_env=CXX=clang++
 build --action_env=CC --host_action_env=CC
 build --action_env=CXX --host_action_env=CXX
 build --action_env=LLVM_CONFIG --host_action_env=LLVM_CONFIG
@@ -65,6 +68,9 @@ build:linux --copt=-fdebug-types-section
 build:linux --copt=-fPIC
 build:linux --copt=-Wno-deprecated-declarations
 build:linux --cxxopt=-std=c++20 --host_cxxopt=-std=c++20
+build:linux --cxxopt=-Wno-template-id-cdtor
+build:linux --cxxopt=-Wno-template-body
+build:linux --cxxopt=-Wno-maybe-uninitialized
 build:linux --cxxopt=-fsized-deallocation --host_cxxopt=-fsized-deallocation
 build:linux --conlyopt=-fexceptions
 build:linux --fission=dbg,opt
@@ -74,6 +80,7 @@ build:linux --action_env=BAZEL_LINKOPTS=-lm
 
 # We already have absl in the build, define absl=1 to tell googletest to use absl for backtrace.
 build --define absl=1
+build --define tcmalloc=disabled
 
 # Disable ICU linking for googleurl.
 build --@com_googlesource_googleurl//build_config:system_icu=0
@@ -93,7 +100,8 @@ build:clang-pch --spawn_strategy=local
 build:clang-pch --define=ENVOY_CLANG_PCH=1
 
 # Use gold linker for gcc compiler.
-build:gcc --linkopt=-fuse-ld=gold
+# build:gcc --linkopt=-fuse-ld=gold
+build:gcc --linkopt=-fuse-ld=lld
 build:gcc --test_env=HEAPCHECK=
 build:gcc --action_env=BAZEL_COMPILER=gcc
 build:gcc --action_env=CC=gcc --action_env=CXX=g++

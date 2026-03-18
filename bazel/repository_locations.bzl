@@ -487,9 +487,9 @@ REPOSITORY_LOCATIONS_SPEC = dict(
         project_url = "https://luajit.org",
         # LuaJIT only provides rolling releases
         version = "d06beb0480c5d1eb53b3343e78063950275aa281",
-        sha256 = "6abd146a1dfa240a965748f63221633446affa2a715e3eb03879136e3efb95f4",
-        strip_prefix = "LuaJIT-{version}",
-        urls = ["https://github.com/LuaJIT/LuaJIT/archive/{version}.tar.gz"],
+        sha256 = "a5d211370a1112615a0bb20613ad97e7bcd32902b413a6a53bf23382c3061102",
+        strip_prefix = "LuaJIT-83b6dffcf4ffea376298f3fac3452841eabd0606",
+        urls = ["https://github.com/loongson/LuaJIT/archive/83b6dffcf4ffea376298f3fac3452841eabd0606.tar.gz"],
         release_date = "2024-03-10",
         use_category = ["dataplane_ext"],
         extensions = [
@@ -1208,7 +1208,7 @@ REPOSITORY_LOCATIONS_SPEC = dict(
         project_url = "https://quiche.googlesource.com/googleurl",
         # Static snapshot of https://quiche.googlesource.com/googleurl/+archive/dd4080fec0b443296c0ed0036e1e776df8813aa7.tar.gz
         version = "dd4080fec0b443296c0ed0036e1e776df8813aa7",
-        sha256 = "59f14d4fb373083b9dc8d389f16bbb817b5f936d1d436aa67e16eb6936028a51",
+        sha256 = "fc694942e8a7491dcc1dde1bddf48a31370a1f46fef862bc17acf07c34dc6325",
         urls = ["https://storage.googleapis.com/quiche-envoy-integration/{version}.tar.gz"],
         use_category = ["controlplane", "dataplane_core"],
         extensions = [],

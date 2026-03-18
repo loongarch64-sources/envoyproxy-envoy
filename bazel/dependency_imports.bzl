@@ -19,13 +19,13 @@ load("@rules_rust//rust:repositories.bzl", "rules_rust_dependencies", "rust_regi
 load("@upb//bazel:workspace_deps.bzl", "upb_deps")
 
 # go version for rules_go
-GO_VERSION = "1.20"
+GO_VERSION = "host"
 
 JQ_VERSION = "1.7"
 YQ_VERSION = "4.24.4"
 
 def envoy_dependency_imports(go_version = GO_VERSION, jq_version = JQ_VERSION, yq_version = YQ_VERSION):
-    rules_foreign_cc_dependencies()
+    rules_foreign_cc_dependencies(register_default_tools = False, register_preinstalled_tools = True, register_built_tools= False, register_built_pkgconfig_toolchain = False)
     go_rules_dependencies()
     go_register_toolchains(go_version)
     if go_version != "host":
