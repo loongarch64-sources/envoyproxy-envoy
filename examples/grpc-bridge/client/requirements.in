@@ -1,0 +1,4 @@
+grpcio
+grpcio-tools
+protobuf>=3.18.0
+requests>=2.32.0
